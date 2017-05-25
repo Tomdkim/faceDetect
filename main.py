@@ -1,5 +1,4 @@
 import json
-from utils_image import (read_image, read_image_base64, save_image, draw_face, draw_box, draw_text)
 import io
 import os
 from google.cloud import vision
@@ -8,6 +7,7 @@ import numpy
 from ast import literal_eval
 import sys
 import inspect
+from base64 import b64encode
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="cred/service_account.json"
 
@@ -50,7 +50,11 @@ def main():
 
 		print('face bounds: {}'.format(','.join(vertices)))
 
-	save_image(outputfile, a)
+	cv2.imwrite(outputfile, a)
+
+def read_image_base64(filename):
+	with open(filename, 'rb') as f:
+		return b64encode(f.read())
 	
 def make_request(inputfile):
 	""" Create a request batch (one file at a time) """
