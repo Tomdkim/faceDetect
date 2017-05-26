@@ -16,7 +16,16 @@ def main():
 	inputfile = str(sys.argv[1])
 	outputfile = "output of: " + inputfile
 
-	myDict = {'chin_gnathion', 'forehead_glabella', 'left_ear_tragion', 'left_eye', 'left_eye_bottom_boundary', 'left_eye_left_corner', 'left_eye_pupil', 'left_eye_right_corner', 'left_eye_top_boundary', 'left_eyebrow_upper_midpoint', 'left_of_left_eyebrow', 'left_of_right_eyebrow', 'lower_lip', 'midpoint_between_eyes', 'mouth_center', 'mouth_left', 'mouth_right', 'nose_bottom_center', 'nose_bottom_left', 'nose_bottom_right', 'nose_tip', 'right_ear_tragion', 'right_eye', 'right_eye_bottom_boundary', 'right_eye_left_corner', 'right_eye_pupil', 'right_eye_right_corner', 'right_eye_top_boundary', 'right_eyebrow_upper_midpoint', 'right_of_left_eyebrow', 'right_of_right_eyebrow', 'upper_lip'}
+	myDict = {'chin_gnathion', 'left_ear_tragion', 'left_eye_pupil', 'mouth_center', 'right_ear_tragion', 'right_eye_pupil'}
+
+	midpointeyesDict = {'forehead_glabella', 'midpoint_between_eyes','nose_tip'}
+	lefteyeDict = {'left_eye', 'left_eye_bottom_boundary', 'left_eye_left_corner', 'left_eye_right_corner', 'left_eye_top_boundary'}
+	righteyeDict = {'right_eye', 'right_eye_bottom_boundary', 'right_eye_left_corner', 'right_eye_right_corner', 'right_eye_top_boundary'}
+	lefteyebrowDict = {'left_eyebrow_upper_midpoint', 'left_of_left_eyebrow', 'right_of_left_eyebrow'}
+	righteyebrowDict = {'left_of_right_eyebrow', 'right_eyebrow_upper_midpoint', 'right_of_right_eyebrow'}
+	noseDict = {'nose_tip','nose_bottom_right','nose_bottom_center','nose_bottom_left'}
+	mouseDict = {'lower_lip', 'mouth_left', 'upper_lip', 'mouth_right'}
+	list_of_dict = [midpointeyesDict,lefteyeDict,righteyeDict,lefteyebrowDict,righteyebrowDict,noseDict,mouseDict]
 
 	vision_client = vision.Client()
 	body = make_request(inputfile)
@@ -37,11 +46,42 @@ def main():
 		vertices = (['({},{})'.format(bound.x_coordinate, bound.y_coordinate)
 					for bound in face.bounds.vertices])
 
-		for attr in myDict:
-			x = getattr(face._landmarks,attr)._position._x_coordinate
-			y = getattr(face._landmarks,attr)._position._y_coordinate
-			pt = (int(x),int(y))
-			cv2.circle(a, pt, 3, (0,255,0))
+		for dictionary in list_of_dict:
+			points = []
+			target = 0
+			for attr in dictionary:
+				x = getattr(face._landmarks,attr)._position._x_coordinate
+				y = getattr(face._landmarks,attr)._position._y_coordinate
+				pt = (int(x),int(y))
+				points.append(pt)
+				cv2.circle(a, pt, 1, (0,255,0))
+			length = len(points)
+			while (target < length):
+				if (target == length - 1):
+					cv2.line(a, points[target], points[0], (0,255,0), thickness=1)
+				else:
+					cv2.line(a, points[target], points[target+1], (0,255,0), thickness=1)
+				target += 1
+
+
+		# for attr in myDict:
+		# 	x = getattr(face._landmarks,attr)._position._x_coordinate
+		# 	y = getattr(face._landmarks,attr)._position._y_coordinate
+		# 	pt = (int(x),int(y))
+		# 	points.append(pt)
+		# 	cv2.circle(a, pt, 3, (0,255,0))
+
+		# length = len(points)
+		# count = 0
+		# target = 0
+		# while (target < length):
+		# 	count = target + 1
+		# 	while (count < length):
+		# 		cv2.line(a, points[target], points[count], (0,255,0), thickness=1)
+		# 		count += 1
+		# 	target += 1
+
+
 		cv2.rectangle(a,literal_eval(vertices[0]),literal_eval(vertices[2]),(255,255,0),1)
 
 		print('anger: {}'.format(face.emotions.anger))
